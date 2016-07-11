@@ -81,11 +81,40 @@ public class App {
 		}
 	}
 	public void initTable(){
+		int fDim = 0;
+		int sDim = 0;
+		boolean isValid;
 		System.out.println("[Set new table dimensions]");
-		System.out.println("Row: ");
-		int fDim = scanner.nextInt();
-		System.out.println("Column: ");
-		int sDim = scanner.nextInt();
+		do {
+			isValid = true;
+			try {
+				System.out.println("Row: ");
+				fDim = scanner.nextInt();
+				if (fDim < 1){
+					isValid = false;
+					System.out.println("[Row count should be atleast 1]");
+				}
+			} catch (InputMismatchException ex){
+				isValid = false;
+				System.out.println("[Invalid row value]");
+				scanner.nextLine();
+			}
+		} while(!isValid);
+		do {
+			isValid = true;
+			try {
+				System.out.println("Column: ");
+				sDim = scanner.nextInt();
+				if (sDim < 1){
+					isValid = false;
+					System.out.println("[Column count should be atleast 1]");
+				}
+			} catch (InputMismatchException ex){
+				isValid = false;
+				System.out.println("[Invalid column value]");
+				scanner.nextLine();
+			}
+		} while (!isValid);
 		table = new LinkedList<>();
 		for (int x = 0; x < fDim; x++){
 			Map<String,String> row = new LinkedHashMap<>();
