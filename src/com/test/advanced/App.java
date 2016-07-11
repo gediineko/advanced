@@ -28,62 +28,30 @@ public class App {
 			FileUtil.writeFile(table);
 		}
 		printTable();
-		boolean cont = true;
-		do {
-			System.out.println("\nMenu: [1 Search] [2 Edit] [3 Print] [4 Add Row] [5 Sort] [6 Reset] [7 Exit]");
-			int opt = scanner.nextInt();
-			scanner.nextLine();
-			switch(opt){
-				case 1: 
-					searchTable();
-					System.out.println("");
-					break;
-				case 2:
-				    editTable();
-				    System.out.println("");
-					break;
-				case 3:
-					printTable();
-					System.out.println("");
-					break;
-				case 4: 
-					addRow();
-					break;
-				case 5: 
-					sort();
-					break;
-				case 6:
-					initTable();
-					System.out.println("");
-					break;
-				case 7: 
-					cont = false;
-					break;
-				default:
-					System.out.println("Invalid option.");
-					break;
-			}
-		} while (cont);
-		System.out.println("- End -");
+		menu();
 	}
 	public void menu(){
-		boolean cont = true;
+		int opt;
+		boolean cont;
 		do {
-			System.out.println("\nMenu: [1 Search] [2 Edit] [3 Print] [4 Add Row] [5 Sort] [6 Reset] [7 Exit]");
-			int opt = scanner.nextInt();
+			opt = 0;
+			cont = true;
+			try {
+			  System.out.println("Menu: [1 Search] [2 Edit] [3 Print] [4 Add Row] [5 Sort] [6 Reset] [7 Exit]");
+			  opt = scanner.nextInt();
+			} catch (InputMismatchException ex){
+				cont = true;
+			}
 			scanner.nextLine();
 			switch(opt){
 				case 1: 
 					searchTable();
-					System.out.println("");
 					break;
 				case 2:
 				    editTable();
-				    System.out.println("");
 					break;
 				case 3:
 					printTable();
-					System.out.println("");
 					break;
 				case 4: 
 					addRow();
@@ -93,17 +61,16 @@ public class App {
 					break;
 				case 6:
 					initTable();
-					System.out.println("");
 					break;
 				case 7: 
 					cont = false;
 					break;
 				default:
-					System.out.println("Invalid option.");
+					System.out.println("[Invalid option]");
 					break;
 			}
 		} while (cont);
-		System.out.println("- End -");
+		System.out.println("Exiting...");
 	}
 	public void printTable(){
 		for(Map<String, String> row : table){
@@ -114,9 +81,10 @@ public class App {
 		}
 	}
 	public void initTable(){
-		System.out.println("First dimension: ");
+		System.out.println("[Set new table dimensions]");
+		System.out.println("Row: ");
 		int fDim = scanner.nextInt();
-		System.out.println("Second dimension: ");
+		System.out.println("Column: ");
 		int sDim = scanner.nextInt();
 		table = new LinkedList<>();
 		for (int x = 0; x < fDim; x++){
@@ -128,7 +96,7 @@ public class App {
 		}
 	}
 	public void searchTable(){
-		System.out.println("Search for: ");
+		System.out.print("Search for: ");
 		String character = scanner.nextLine();
 		List<Map<String,String>> result = new ArrayList<>();
 		int x = 0;
@@ -136,14 +104,14 @@ public class App {
 		for(Map<String, String> row : table){
 			y = 0;
 			for(Map.Entry<String, String> entry : row.entrySet()){
-				if (character.equals(entry.getKey())) {
+				if (entry.getKey().contains(character)) {
 					Map<String,String> keyFound = new HashMap<>();
 					keyFound.put("x", x + "");
 					keyFound.put("y", y + "");
 					keyFound.put("entryType", "KEY");
 					result.add(keyFound);
 				}
-				 if (character.equals(entry.getValue())) {
+				 if (entry.getValue().contains(character)) {
 				 	Map<String,String> valueFound = new HashMap<>();
 					valueFound.put("x", x + "");
 					valueFound.put("y", y + "");
@@ -157,31 +125,56 @@ public class App {
 		if(result.size() > 0){
 			int keyCount = 0;
 			int valueCount = 0;
-			System.out.print("\nResult(s): ");
+			System.out.print("Result(s): ");
 			for (Map<String,String> entry : result){
-				System.out.print(entry.get("entryType") + ":[" + entry.get("x") + "," + entry.get("y") + "] " );
+				System.out.print("\n"  + "[" + entry.get("x") + "," + entry.get("y") + "] : " + entry.get("entryType"));
 				if (entry.get("entryType").equals("KEY")){
 					keyCount++;
 				} else {
 					valueCount++;
 				}
 			}
-			System.out.println("\nNo. of occurences as KEY: " + keyCount);
-			System.out.println("No. of occurences as VALUE: " + valueCount);
+			System.out.println("\nOccurences as KEY: " + keyCount);
+			System.out.println("Occurences as VALUE: " + valueCount);
 			System.out.println("Total occurences: " + (keyCount+valueCount));
-		}	
+		} else {
+			System.out.println("[No data found]");
+		}
 	}
 	public void editTable(){
-		System.out.print("Enter index of set to edit:\nFirst index: ");
-		int fInd = scanner.nextInt();
-		System.out.print("Second index: ");
-		int sInd = scanner.nextInt();
+		int fInd = 0;
+		int sInd = 0;
+		boolean isValid = false;
+		System.out.println("[Enter index of set to edit]");
+		do {
+			try {
+				isValid = true;
+				System.out.print("Row: ");
+				fInd = scanner.nextInt();
+				//if (fInd > table length)
+			} catch (InputMismatchException ex) {
+				System.out.println("[Invalid row value]");
+				scanner.nextLine();
+				isValid = false;
+			}
+		} while (!isValid);
+		do {
+			try {
+				isValid = true;
+				System.out.print("Column: ");
+				sInd = scanner.nextInt();
+			} catch (InputMismatchException ex){
+				System.out.println("[Invalid column value]");
+				scanner.nextLine();
+				isValid = false;
+			}
+		} while (!isValid);
 		// System.out.println("\n" + table.get(fInd));
 		Map<String,String> editedMap = new LinkedHashMap<>();
 		boolean repeat = true;
 		String identifier = "";
 		do {
-			System.out.println("What would you like to change? 1) KEY 2) VALUE");
+			System.out.println("What would you like to change? [1 KEY] [2 VALUE]");
 			int option = scanner.nextInt();
 			scanner.nextLine();
 			switch (option) {
