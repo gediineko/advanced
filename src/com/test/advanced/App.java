@@ -11,13 +11,14 @@ import java.util.HashMap;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.InputMismatchException;
+//import java.lang.ArrayIndexOutOfBoundsException;
 public class App {
 	private Scanner scanner;
 	private List<Map<String,String>> table;
+	private static final int MAX_LEN = -1;
 	public App () {
 		table = FileUtil.readFile();
 		scanner = new Scanner(System.in);
-
 	}
 	public static void main (String[] args){
 		new App().run();
@@ -88,7 +89,7 @@ public class App {
 		do {
 			isValid = true;
 			try {
-				System.out.println("Row: ");
+				System.out.print("Row: ");
 				fDim = scanner.nextInt();
 				if (fDim < 1){
 					isValid = false;
@@ -103,7 +104,7 @@ public class App {
 		do {
 			isValid = true;
 			try {
-				System.out.println("Column: ");
+				System.out.print("Column: ");
 				sDim = scanner.nextInt();
 				if (sDim < 1){
 					isValid = false;
@@ -119,10 +120,15 @@ public class App {
 		for (int x = 0; x < fDim; x++){
 			Map<String,String> row = new LinkedHashMap<>();
 			for (int y = 0; y < sDim; y++){
-				row.put(RandomUtil.generate(3), RandomUtil.generate(3));
+				if (MAX_LEN != -1){
+					row.put(RandomUtil.generate(MAX_LEN), RandomUtil.generate(MAX_LEN));
+				} else {
+					row.put(RandomUtil.generate(3), RandomUtil.generate(3));
+				}
 			}
 			table.add(row);
 		}
+		FileUtil.writeFile(table);
 	}
 	public void searchTable(){
 		System.out.print("Search for: ");
@@ -135,15 +141,15 @@ public class App {
 			for(Map.Entry<String, String> entry : row.entrySet()){
 				if (entry.getKey().contains(character)) {
 					Map<String,String> keyFound = new HashMap<>();
-					keyFound.put("x", x + "");
-					keyFound.put("y", y + "");
+					keyFound.put("x", (x+1) + "");
+					keyFound.put("y", (y+1) + "");
 					keyFound.put("entryType", "KEY");
 					result.add(keyFound);
 				}
 				 if (entry.getValue().contains(character)) {
 				 	Map<String,String> valueFound = new HashMap<>();
-					valueFound.put("x", x + "");
-					valueFound.put("y", y + "");
+					valueFound.put("x", (x+1) + "");
+					valueFound.put("y", (y+1) + "");
 					valueFound.put("entryType", "VALUE");
 					result.add(valueFound);
 				}
@@ -180,7 +186,10 @@ public class App {
 				isValid = true;
 				System.out.print("Row: ");
 				fInd = scanner.nextInt();
-				//if (fInd > table length)
+				if (fInd > table.size()){
+					isValid = false;
+					System.out.println("[Invalid row value]");
+				}
 			} catch (InputMismatchException ex) {
 				System.out.println("[Invalid row value]");
 				scanner.nextLine();
@@ -192,6 +201,10 @@ public class App {
 				isValid = true;
 				System.out.print("Column: ");
 				sInd = scanner.nextInt();
+				if (sInd > table.get(0).size()){
+					isValid = false;
+					System.out.println("[Invalid column value]");
+				}
 			} catch (InputMismatchException ex){
 				System.out.println("[Invalid column value]");
 				scanner.nextLine();
@@ -200,34 +213,51 @@ public class App {
 		} while (!isValid);
 		// System.out.println("\n" + table.get(fInd));
 		Map<String,String> editedMap = new LinkedHashMap<>();
-		boolean repeat = true;
+		boolean repeat;
 		String identifier = "";
 		do {
-			System.out.println("What would you like to change? [1 KEY] [2 VALUE]");
-			int option = scanner.nextInt();
-			scanner.nextLine();
-			switch (option) {
-				case 1: 
-					identifier = "KEY";
-					repeat = false;
-					break;
-				case 2:
-					identifier	= "VALUE";
-					repeat = false;
-					break;
-				default: 
-					System.out.println("You need to choose if you want to edit a KEY or a VALUE!");
-					break;
+			repeat = true;
+			try {	
+				//System.out.println("Current value: ");
+				System.out.println("What would you like to change? [1 KEY] [2 VALUE]");
+				int option = scanner.nextInt();
+				scanner.nextLine();
+				switch (option) {
+					case 1: 
+						identifier = "KEY";
+						repeat = false;
+						break;
+					case 2:
+						identifier	= "VALUE";
+						repeat = false;
+						break;
+					default: 
+						System.out.println("[Invalid option]");
+						break;
+				} 
+			} catch (InputMismatchException ex){
+				System.out.println("[Invalid option]");
+				scanner.nextLine();
+				repeat = true;
 			}
 		} while (repeat);
 		//GET NEW VALUE
-		System.out.println("Enter new info: ");
-		String newValue = scanner.nextLine();
+		boolean valid;
+		String newValue;
+		do {
+			valid = true;
+			System.out.println("Enter new info: ");
+			newValue = scanner.nextLine();
+			if (newValue.length() != MAX_LEN && MAX_LEN != -1){
+				System.out.println("[New value should be " + MAX_LEN + " characters]");
+				valid = false;
+			}
+		} while (!valid);
 		int x = 0;
-		for (Map.Entry<String,String> entry : table.get(fInd).entrySet()){
+		for (Map.Entry<String,String> entry : table.get(fInd-1).entrySet()){
 			String key = entry.getKey();
 			String value = entry.getValue();
-			if (x == sInd){
+			if (x == sInd-1){
 				if(identifier.equals("KEY")){
 					key = newValue;
 				} else {
@@ -237,16 +267,37 @@ public class App {
 			editedMap.put(key, value);
 			x++;
 		}
-		table.set(fInd, editedMap);
+		table.set(fInd-1, editedMap);
 		FileUtil.writeFile(table);
 	}
 	public void addRow(){
 		Map<String,String> newRow = new LinkedHashMap<>();
-		System.out.println("Adding new row...\nInput " + table.get(0).size() + " key and value pairs separated by commas.\nex: <key>,<value>");
+		System.out.println("Adding new row...\nInput " + table.get(0).size() 
+			+ " key and value pairs separated by commas.\nex: key,value");
 		for (int y = 0; y < table.get(0).size(); y++){
-			String entry = scanner.nextLine();
-			String[] keyValue = entry.split(",");
-			newRow.put(keyValue[0],keyValue[1]);
+			boolean isValid;
+			do {
+				isValid = true;
+				try {
+					System.out.print("[Pair #" + (y+1) + "] ");
+					String entry = scanner.nextLine();
+					String[] keyValue = entry.split(",");
+					if (newRow.containsKey(keyValue[0])){
+						System.out.println("[Keys per row should be unique]");
+						isValid = false;
+					} else if ((keyValue[0].length() != MAX_LEN && MAX_LEN != -1) 
+						|| (keyValue[1].length() != MAX_LEN && MAX_LEN != -1)){ 
+						System.out.println("[Keys and Values should be " + MAX_LEN + " characters only]");
+						isValid = false;
+					} else {
+						newRow.put(keyValue[0],keyValue[1]);
+					}
+				} catch (ArrayIndexOutOfBoundsException ex){
+					isValid = false;
+					System.out.println("[Invalid pair input]");
+				}		
+			} while (!isValid);
+		
 		}
 		table.add(newRow);
 		FileUtil.writeFile(table);
