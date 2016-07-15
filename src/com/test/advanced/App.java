@@ -4,17 +4,18 @@ import com.test.advanced.util.FileUtil;
 import java.util.Scanner;
 import java.util.List;
 import java.util.LinkedList;
-import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.InputMismatchException;
 public class App {
 	private Scanner scanner;
 	private List<Map<String,String>> table;
-	private static final int MAX_LEN = -1;
+	//Set the max size of each table content, -1 means off
+	private static final int MAX_LEN = -1; 
 	public App () {
 		table = FileUtil.readFile();
 		scanner = new Scanner(System.in);
@@ -23,7 +24,7 @@ public class App {
 		new App().run();
 	}
 	public void run (){
-		//CHECK IF FILE IS EMPTY OR EXISTING
+		//Check if file is empty or existing
 		if (table == null){
 			initTable();
 			FileUtil.writeFile(table);
@@ -116,7 +117,7 @@ public class App {
 				scanner.nextLine();
 			}
 		} while (!isValid);
-		//FILL THE LIST OF MAP WITH RANDOM CHARS
+		//Fill the list of map with random characters
 		table = new LinkedList<>();
 		for (int x = 0; x < fDim; x++){
 			Map<String,String> row = new LinkedHashMap<>();
@@ -137,7 +138,7 @@ public class App {
 		List<Map<String,String>> result = new ArrayList<>();
 		int x = 0;
 		int y = 0;
-		//CHECK IF KEY OR VALUE CONTAINS THE CHAR SEARCHED
+		//Check if key or value contains the char searched
 		for(Map<String, String> row : table){
 			y = 0;
 			for(Map.Entry<String, String> entry : row.entrySet()){
@@ -159,7 +160,7 @@ public class App {
 			}
 			x++;
 		}
-		//CHECK IF THE CHAR IS FOUND ON LIST OF MAP
+		//Check if char is found on list of map
 		if(result.size() > 0){
 			int keyCount = 0;
 			int valueCount = 0;
@@ -242,7 +243,7 @@ public class App {
 				repeat = true;
 			}
 		} while (repeat);
-		//GET NEW VALUE
+		//Get new value for k or v
 		boolean valid;
 		String newValue;
 		do {
@@ -275,7 +276,7 @@ public class App {
 		Map<String,String> newRow = new LinkedHashMap<>();
 		System.out.println("Adding new row...\nInput " + table.get(0).size() 
 			+ " key and value pairs separated by commas.\nex: key,value");
-		//GET KEYVALUE PAIRS FOR NEW ROW 
+		//Get KV pairs for new row
 		for (int y = 0; y < table.get(0).size(); y++){
 			boolean isValid;
 			do {
@@ -305,11 +306,11 @@ public class App {
 		FileUtil.writeFile(table);
 	}
 	public void sort(){
-		//SORT PER ROW
+		//Sort per row
 		List<Map<String,String>> sortedTable = new LinkedList<>();
 		for (Map<String,String> row : table){
 			List<Map.Entry<String,String>> list = new LinkedList<Map.Entry<String,String>>(row.entrySet());
-			Collections.sort(list, new Comparator<Map.Entry<String,String>>(){
+			Collections.sort(list, new Comparator<Map.Entry<String,String>>(){ // Anonymous class
 				public int compare(Map.Entry<String,String> ent1, Map.Entry<String,String> ent2){
 					return (ent1.getKey() + ent1.getValue()).compareTo(ent2.getKey() + ent2.getValue());
 				}
@@ -320,8 +321,7 @@ public class App {
 			}
 			sortedTable.add(sortedMap);
 		}
-
-		//SORT PER COLUMN
+		//Sort per column
 		// Collections.sort(sortedTable, new Comparator<Map<String,String>>(){
 		// 	public int compare(Map<String,String> map1, Map<String,String> map2){
 		// 			String o1 = "";
@@ -336,9 +336,9 @@ public class App {
 		// 			return o1.compareTo(o2);
 		// 	}
 		// });
-
 		table = sortedTable;
 		FileUtil.writeFile(table);
+		System.out.println("Table sorted!");
 	}
 }
 
