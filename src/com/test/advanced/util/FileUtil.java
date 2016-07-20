@@ -17,8 +17,8 @@ import java.lang.StringBuffer;
 public class FileUtil{
 	private static final String DIR_NAME = "resources";
 	private static final String FILE_NAME = "table";
-	private static final String ENTRY_DELIMITER = " \u037E "; //greek question mark
-	private static final String KEY_VALUE_DELIMITER = " \u2261 "; //triple bar
+	public static final String ENTRY_DELIMITER = " \u037E "; //greek question mark
+	public static final String KEY_VALUE_DELIMITER = " \u2261 "; //triple bar
 	public static List<Map<String,String>> readFile(){
 		List<Map<String,String>> table = new LinkedList<>();
 		Path file = FileSystems.getDefault().getPath(DIR_NAME, FILE_NAME);

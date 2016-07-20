@@ -254,6 +254,10 @@ public class App {
 				System.out.println("[New value should be " + MAX_LEN + " characters]");
 				valid = false;
 			}
+			if (newValue.equals(FileUtil.ENTRY_DELIMITER) || newValue.equals(FileUtil.KEY_VALUE_DELIMITER)){
+				System.out.println("Input is used as delimiter on file. Try a different one.");
+				valid = false;
+			}
 		} while (!valid);
 		int x = 0;
 		for (Map.Entry<String,String> entry : table.get(fInd-1).entrySet()){
@@ -291,6 +295,10 @@ public class App {
 					} else if ((keyValue[0].length() != MAX_LEN && MAX_LEN != -1) 
 						|| (keyValue[1].length() != MAX_LEN && MAX_LEN != -1)){ 
 						System.out.println("[Keys and Values should be " + MAX_LEN + " characters only]");
+						isValid = false;
+					} else if (keyValue[0].equals(FileUtil.ENTRY_DELIMITER) || keyValue[0].equals(FileUtil.KEY_VALUE_DELIMITER)
+						|| keyValue[1].equals(FileUtil.ENTRY_DELIMITER) || keyValue[1].equals(FileUtil.KEY_VALUE_DELIMITER)){
+						System.out.println("One or both of the data input is used as a delimiter on file.\nTry a different one.");
 						isValid = false;
 					} else {
 						newRow.put(keyValue[0],keyValue[1]);
